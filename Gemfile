@@ -23,7 +23,7 @@ gem 'devise', '3.2.2'
 
 # Captcha
 
-gem 'galetahub-simple_captcha', '0.1.5', :require => 'simple_captcha'
+gem 'simple_captcha2', '0.2.1', :require => 'simple_captcha'
 
 # Background processing
 
