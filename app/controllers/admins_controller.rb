@@ -1,6 +1,9 @@
 class AdminsController < ApplicationController
   before_filter :authenticate_user!
   before_filter :redirect_unless_admin
+  before_filter { @css_framework = :bootstrap }
+
+  layout 'with_header_with_footer'
 
   def user_search
     params[:user] ||= {}
