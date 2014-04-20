@@ -1,15 +1,23 @@
 class AdminsController < ApplicationController
   before_filter :authenticate_user!
   before_filter :redirect_unless_admin
-  before_filter { @css_framework = :bootstrap }
+
+  use_bootstrap_for :stats, :user_search
 
   layout 'with_header_with_footer'
 
   def user_search
     params[:user] ||= {}
     params[:user].delete_if {|key, value| value.blank? }
-    @users = User.joins(person: :profile).where(["profiles.birthday > ?", Date.today - 13.years]) if params[:under13]
-    @users = (@users || User).where(params[:user]) if params[:user].present?
+
+    if params[:user].present? || params[:under13]
+      @users = User.joins(person: :profile).where(["profiles.birthday > ?", Date.today - 13.years]) if params[:under13]
+
+      @users = (@users || User).where(params[:user]) if params[:user].present?
+    else
+      @users = User.limit(10).order('id DESC')
+    end
+
     @users ||= []
   end
 

@@ -1,47 +1,50 @@
+.container#admin_container
+  .row-fluid
+    .span3
+      = render :partial => 'admins/admin_bar'
 
-.span-24
-  = render :partial => 'admins/admin_bar'
-.span-24.prepend-4
+    .span9
+      .row-fluid
+        .span7
+          %h3= t('admins.admin_bar.user_search')
+          = form_tag 'user_search', method: :get, class: 'form-horizontal' do
+            .control-group
+              %label.control-label{for: ""}
+                = t('username')
+              .controls
+                = text_field_tag 'user[username]', params[:user][:username]
 
-  %h3
-    != t('.you_currently', :count => current_user.invitation_code.count, :link => link_to(t(".add_invites"), add_invites_path(current_user.invitation_code)))
-    
-    = form_tag 'admin_inviter', :method => :get do
-      = t('.email_to')
-      = text_field_tag 'identifier'
-      = submit_tag t('services.remote_friend.invite')
-
-
-
-  %h3
-    = t('admins.admin_bar.user_search')
-  = form_tag 'user_search', :method => :get do
-    = t('username')
-    = text_field_tag 'user[username]', params[:user][:username]
-
-    = t('email')
-    = text_field_tag 'user[email]', params[:user][:email]
-
-    = t('.under_13')
-    = check_box_tag 'under13', params[:under13]
-
-    = submit_tag t('admins.stats.go')
-
-
-  = t('.users', :count => @users.count)
-  %br
-  %br
-  - @users.each do |user|
-    = user.inspect
-    %br
-    - if user.person
-      = user.person.inspect
-      %br
-      - if user.person.profile
-        = user.person.profile.inspect
-      %br
-    = "invite token: #{invite_code_url(user.invited_by.invite_code)}" if user.invited_by.present?
-    = link_to t(".add_invites"), add_invites_path(user.invitation_code)
-    %br
-    %br
-    %br
+            .control-group
+              %label.control-label
+                = t('email')
+              .controls
+                = text_field_tag 'user[email]', params[:user][:email]
+            .control-group
+              .controls
+                %label.checkbox
+                  = t('.under_13')
+                  = check_box_tag 'under13', params[:under13]
+            .control-group
+              .controls
+                = submit_tag t('admins.stats.go'), class: 'btn'
+        .span5
+          %h3 Invite a user
+          = form_tag 'admin_inviter', method: :get, class: 'form-vertical' do
+            .input-append
+              = text_field_tag 'identifier', nil, placeholder: t('.email_to')
+              = submit_tag t('services.remote_friend.invite'), class: 'btn'
+            %small
+              != t('.you_currently', :count => current_user.invitation_code.count, :link => link_to(t(".add_invites"), add_invites_path(current_user.invitation_code)))
+      .row-fluid
+        .span6
+          %h4.results-count= t('admins.user_search.users', count: @users.size) 
+      .row-fluid
+        - @users.in_groups(2, false) do |users|
+          .span6.users
+            - users.each do |user|
+              .user
+                .img= person_image_link(user.person, :size => :thumb_small)
+                .info
+                  = person_link(user.person)
+                  .handle
+                    %small= user.diaspora_handle
